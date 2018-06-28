@@ -1,0 +1,53 @@
+@()
+<div class="page-sidebar-wrapper">
+    <div class="page-sidebar navbar-collapse collapse">
+        <ul class="page-sidebar-menu " data-auto-scroll="true" data-slide-speed="200" id="projects">
+
+            <li class="sidebar-toggler-wrapper">
+                    <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+                <div class="sidebar-toggler">
+                </div>
+                    <!-- END SIDEBAR TOGGLER BUTTON -->
+            </li>
+
+            <li style="height: 10px"></li>
+
+            <li id="home">
+                <a id="admin">
+                    <i class="fa fa-th-large"></i>
+                    <span class="title">管理账号</span>
+                    <span class='selected'></span>
+                </a>
+            </li>
+
+            <li>
+                <a id="pa">
+                    <i class="fa fa-th-large"></i>
+                    <span class="title">管理转录组参考基因组</span>
+                    <span class='selected'></span>
+                </a>
+            </li>
+
+            <li class="active">
+                <a href='@routes.SpeciesController.adminHome()'>
+                    <i class="fa fa-th-large"></i>
+                    <span class="title">管理重测序参考基因组</span>
+                    <span class='selected'></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+
+        var host = window.location.host.split(":")[0];
+        $("#admin").attr("href","http://" + host + "/back/adminPage");
+        $("#pa").attr("href","http://" + host + ":8003/parametron/species/admin/speciesInfo")
+
+</script>
+
+
+
+
+

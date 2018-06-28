@@ -1,0 +1,795 @@
+@(projectName: Seq[String], proname: String)(implicit session: Session)
+@fileupload.main("重测序分析结果", projectName, proname) {
+
+    <style>
+            .update {
+                border-radius: 15px 15px 15px 15px;
+                background-color: transparent;
+                color: gray;
+                border: 0px;
+            }
+
+            .update:hover {
+                color: gray;
+                background-color: lightgray;
+            }
+
+            .fastq {
+                background-color: transparent;
+                color: gray;
+                border: 0px;
+            }
+
+            .fastq:hover {
+                color: black;
+                text-decoration: underline;
+            }
+
+            .delete {
+                border-radius: 15px 15px 15px 15px;
+                background-color: transparent;
+                color: gray;
+                border: 0px;
+            }
+
+            .delete:hover {
+                color: white;
+                background-color: red;
+            }
+
+            .state {
+                display: none;
+            }
+
+            .layui-layer-title {
+                background-color: #428BCA;
+                height: 55px;
+            }
+    </style>
+
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet blue-madison box">
+
+                <div class="portlet-title">
+                    <div class="caption">
+                        分析结果
+                    </div>
+                </div>
+
+
+                <div class="portlet-body" id="t">
+
+                    <div class="table-responsive" >
+
+                        <table class="display table table-bordered table-hover table-striped" id="table" data-pagination="true" data-search="true"
+                        data-search-align="left" data-page-list="[10, 25, 50, 100]" data-multiple-search="true">
+
+                            <thead>
+                                <tr>
+                                    <th data-field="taskname" data-sortable="true" id="taskname">任务名</th>
+                                    <th data-field="createdate" data-sortable="true" id="createdata">创建时间</th>
+                                    <th data-field="state" data-sortable="true" id="state">运行状态</th>
+                                    <th data-field="results" data-sortable="false" id="results">结果一览</th>
+                                    <th data-field="operation" data-sortable="false" id="operation">操作</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rest" class="modal fade modal-margin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 1000px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">
+                        <span id="lblAddTitle" style="font-weight: bold">设置参数：</span>
+                    </h4>
+                </div>
+                <form id="resetForm" data-toggle="validator" class="registration-form form-horizontal">
+                    <div class="modal-body">
+                        <div class="row-fluid">
+
+                            <div class="form-group">
+                                <label class="col-sm-8">
+                                    样品信息：
+                                </label>
+                                <div class="col-sm-7 indent">
+                                    <input class="form-control" id="samples" name="samples" readonly="readonly" >
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-8" style="display: none;" >
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        ID：
+                                    </label>
+                                    <input class="form-control indent" id="taskIds" name="taskIds" readonly="readonly" >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-6">GATK Unified Genotyper(GATK变异检测参数设置)</label>
+                                <div class="col-sm-1">
+                                    <a id="down-1" style="margin-left: 2em">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </a>
+                                    <a id="up-1" style="margin-left: 2em;
+                                        display: none">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div id="set-1" style="display: none" class="indent">
+
+                                <div class="form-group">
+                                    <p class="col-sm-12">
+                                        Genotype likelihoods calculation model to employ:</p>
+                                    <div class="col-sm-6 indent">
+                                        <select class="form-control" name="genotype_likelihoods_model" id="genotype_likelihoods_model">
+                                            <option value="BOTH">BOTH</option>
+                                            <option value="SNP">SNP</option>
+                                            <option value="INDEL">INDEL</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        The minimum phred-scaled confidence threshold at which variants not at 'trigger' track sites should be called:</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="standard_min_confidence_threshold_for_calling" id="standard_min_confidence_threshold_for_calling" class="form-control" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" >
+                                    <p class="col-sm-10">
+                                        The minimum phred-scaled confidence threshold at which variants not at 'trigger' track sites should be emitted (and filtered if less than the calling threshold)"</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="standard_min_confidence_threshold_for_emitting" id="standard_min_confidence_threshold_for_emitting" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" >
+                                    <p class="col-sm-10">
+                                        Ploidy (number of chromosomes) per sample. For pooled data, set to (Number of samples in each pool * Sample Ploidy)</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="sample_ploidy" id="sample_ploidy" class="form-control"  />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-6">Filter VCF File(变异过滤参数设置)</label>
+                                <div class="col-sm-1">
+                                    <a id="down-2" style="margin-left: 2em">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </a>
+                                    <a id="up-2" style="margin-left: 2em;
+                                        display: none">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div id="set-2" style="display: none" class="indent">
+
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        Minimum Phred-scaled variant Quality</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="minQ" id="minQ" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        Minimum Read Depth</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="MinDepth" id="MinDepth" class="form-control" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        Maximum Read Depth</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="MaxDepth" id="MaxDepth" class="form-control"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        Minimum Phred-scaled p-value Using Fisher's Exact Test To Detect Strand Bias</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="FS" id="FS" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="form-group" >
+                                    <p class="col-sm-12">
+                                        Maximum absolute value of Z-score from Wilcoxon rank sum test of Alt vs. Ref read position bias</p>
+                                    <div class="col-sm-6 indent">
+                                        <input name="RPRS" id="RPRS" class="form-control"  />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-6">Annotate Variants(变异注释参数设置)</label>
+                                <div class="col-sm-1">
+                                    <a id="down-3" style="margin-left: 2em">
+                                        <i class="fa fa-arrow-down"></i>
+                                    </a>
+                                    <a id="up-3" style="margin-left: 2em;
+                                        display: none">
+                                        <i class="fa fa-arrow-up"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div id="set-3" style="display: none;" class="indent">
+
+                                <div class="form-group">
+                                    <p class="col-sm-12">
+                                        Upstream / Downstream length:</p>
+                                    <div class="col-sm-6 indent">
+                                        <select class="form-control" name="udLength" id="udLength">
+                                            <option value="0">No upstream / downstream intervals (0 bases)</option>
+                                            <option value="200">200 bases</option>
+                                            <option value="500">500 bases</option>
+                                            <option value="1000">1000 bases</option>
+                                            <option value="2000">2000 bases</option>
+                                            <option value="5000">5000 bases</option>
+                                            <option value="10000">10000 bases</option>
+                                            <option value="20000">20000 bases</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <p class="col-sm-12">
+                                        Set size for splice sites (donor and acceptor) in bases:</p>
+                                    <div class="col-sm-6 indent">
+                                        <select class="form-control" name="spliceSiteSize" id="spliceSiteSize">
+                                            <option value="1">1 base</option>
+                                            <option value="2">2 bases</option>
+                                            <option value="3">3 bases</option>
+                                            <option value="4">4 bases</option>
+                                            <option value="5">5 bases</option>
+                                            <option value="6">6 bases</option>
+                                            <option value="7">7 bases</option>
+                                            <option value="8">8 bases</option>
+                                            <option value="9">9 bases</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <p class="col-sm-12">
+                                        Suppress reporting usage statistics to server:</p>
+                                    <div class="col-sm-6 indent">
+                                        <select class="form-control" name="noLog" id="noLog">
+                                            <option value="-noLog">Yes</option>
+                                            <option value=" ">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <p class="col-sm-12">
+                                        splice Region Settings:</p>
+                                    <div class="col-sm-6 indent">
+                                        <select class="form-control" name="setSpliceRegions" id="setSpliceRegions" onclick="spliceChange(this)">
+                                            <option value="no">Use Defaults</option>
+                                            <option value="yes">Set Splice Region Parameters</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div id="spliceValue" style="display: none;" class="indent">
+                                    <div class="form-group" >
+                                        <p class="col-sm-12">
+                                            Set size for splice site region within exons.</p>
+                                        <div class="col-sm-6 indent">
+                                            <input name="spliceRegionExonSize" id="spliceRegionExonSize" class="form-control"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-12">
+                                            Set minimum number of bases for splice site region within intron.</p>
+                                        <div class="col-sm-6 indent">
+                                            <input name="spliceRegionIntronMin" id="spliceRegionIntronMin" class="form-control"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-12">
+                                            Set maximum number of bases for splice site region within intron.</p>
+                                        <div class="col-sm-6 indent">
+                                            <input name="spliceRegionIntronMax" id="spliceRegionIntronMax" class="form-control"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-info">
+                        <button type="button" class="btn blue" onclick="Running()">运行</button>
+                        <button type="button" class="btn green" data-dismiss="modal">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="logShow" class="modal fade modal-margin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 1000px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">
+                        <span id="lblAddTitle" style="font-weight: bold">日志信息：</span>
+                        <button type="button" class="btn-remove" data-dismiss="modal" ><i class="fa fa-remove"></i></button>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row-fluid" id="logInfo">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteShow" class="modal fade modal-margin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-top: 200px;">
+        <div class="modal-dialog" style="width: 400px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title" align="center" id="title1">
+                        <span id="deleteTitle" style="font-weight: bold">请确认是否删除任务"
+                            <b id="dtask">
+
+                            </b>"?
+                        </span>
+                    </h4>
+                    <h4 class="modal-title" align="center" id="title2" style="display: none">
+                        <span id="deleteTitle" style="font-weight: bold">删除中...</span>
+                    </h4>
+                    <h4 class="modal-title" align="center" id="title3" style="display: none">
+                        <span id="deleteTitle" style="font-weight: bold">删除成功</span>
+                    </h4>
+                </div>
+                <div class="row-fluid" align="center" >
+                    <div id="warn1">
+                        <img src="/assets/images/warning.png">
+                    </div>
+                    <div id="warn2" style="display: none;">
+                        <img src="/assets/images/timg2.gif" style="height: 109px;">
+                    </div>
+                    <div id="warn3" style="display: none;">
+                        <img src="/assets/images/success.png">
+                    </div>
+                </div>
+                <div class="modal-footer bg-info">
+                    <div align="center">
+                        <button type="button" class="btn red" onclick="deleteTask(this)" style="width: 100px;" id="btn1">
+                            确定</button>
+                        <button type="button" class="btn green" data-dismiss="modal" style="width: 100px;" id="btn2">
+                            取消</button>
+                        <button type="button" class="btn green" onclick="updateDelete()" style="width: 100px;
+                            display: none;" id="btn3">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="warnShow" class="modal fade modal-margin" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-top: 200px;">
+        <div class="modal-dialog" style="width: 400px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title" align="center">
+                        <span id="warnInfo" style="font-weight: bold">
+                        </span>
+                    </h4>
+                </div>
+                <div class="row-fluid" align="center" >
+                    <div>
+                        <img src="/assets/images/warning.png">
+                    </div>
+                </div>
+                <div class="modal-footer bg-info">
+                    <div align="center">
+                        <button type="button" class="btn green" data-dismiss="modal" style="width: 100px;" >
+                            确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+            $(function () {
+                tableInformation();
+                formValidation();
+
+
+                window.setInterval(function () {
+                    $(".state").each(function (n, value) {
+                        var st = value.value;
+                        if (st == 0) {
+                            updateTable();
+                        }
+                    })
+                }, 3000);
+
+
+            })
+
+            function formValidation() {
+                $('#resetForm').formValidation({
+                    framework: 'bootstrap',
+                    icon: {
+                        valid: 'glyphicon glyphicon-ok',
+                        invalid: 'glyphicon glyphicon-remove',
+                        validating: 'glyphicon glyphicon-refresh'
+                    },
+                    fields: {
+                        standard_min_confidence_threshold_for_calling: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                numeric: {
+                                    message: '必须为数字！'
+                                }
+                            }
+                        },
+                        standard_min_confidence_threshold_for_emitting: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                numeric: {
+                                    message: '必须为数字！'
+                                }
+                            }
+                        },
+                        sample_ploidy:{
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                }
+                            }
+                        },
+                        minQ: {
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                numeric: {
+                                    message: '必须为数字！'
+                                }
+                            }
+                        },
+                        MinDepth:{
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                }
+                            }
+                        },
+                        MaxDepth:{
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                }
+                            }
+                        },
+                        FS:{
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                numeric: {
+                                    message: '必须为整数！'
+                                }
+                            }
+                        },
+                        RPRS:{
+                            validators: {
+                                notEmpty: {
+                                    message: '不能为空！'
+                                },
+                                numeric: {
+                                    message: '必须为整数！'
+                                }
+                            }
+                        },
+                        spliceRegionExonSize:{
+                            validators: {
+                                notEmpty:{
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                },
+                                between:{
+                                    min:1,
+                                    max:10,
+                                    message:'范围：1-10!'
+                                }
+                            }
+                        },
+                        spliceRegionIntronMin:{
+                            validators: {
+                                notEmpty:{
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                },
+                                between:{
+                                    min:1,
+                                    max:10,
+                                    message:'范围：1-10!'
+                                }
+                            }
+                        },
+                        spliceRegionIntronMax:{
+                            validators: {
+                                notEmpty:{
+                                    message: '不能为空！'
+                                },
+                                integer: {
+                                    message: '必须为整数！'
+                                },
+                                between:{
+                                    min:1,
+                                    max:10,
+                                    message:'范围：1-10!'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateTask(obj) {
+                var name = obj.value;
+                var id = obj.id;
+                $("#oldtaskname").empty();
+                $("#oldtaskname").val(name);
+                $("#taskId").val(id);
+                $("#update").modal("show")
+            }
+
+            function sureUpdate() {
+                var form = $("#updateForm")
+                var fv = form.data("formValidation")
+                fv.validate()
+                if (fv.isValid()) {
+                    var index = layer.load(1, {
+                        shade: [0.1, '#fff']
+                    });
+                    $.ajax({
+                        url: "@routes.TaskController.updateTaskname()",
+                        type: "put",
+                        dataType: "json",
+                        data: $("#updateForm").serialize(),
+                        success: function (data) {
+                            if (data.valid == "true") {
+                                layer.close(index);
+                                $("#update").modal("hide")
+                                cpm("table", "修改成功");
+                            }
+                        }
+                    })
+                }
+            }
+
+            function restart(obj) {
+                var id = obj.value;
+                $.ajax({
+                    url: "/resequencing/task/getDeploy?id=" + id,
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.valid == "false") {
+                            $("#warnInfo").empty();
+                            $("#warnInfo").append(data.message);
+                            $("#warnShow").modal("show");
+                        } else {
+                            hideArgue();
+                            $("#taskIds").val(id);
+                            $("#samples").val(data.sample);
+                            $("#genotype_likelihoods_model").val(data.genotype_likelihoods_model);
+                            $("#standard_min_confidence_threshold_for_calling").val(data.standard_min_confidence_threshold_for_calling);
+                            $("#standard_min_confidence_threshold_for_emitting").val(data.standard_min_confidence_threshold_for_emitting);
+                            $("#sample_ploidy").val(data.sample_ploidy);
+                            $("#minQ").val(data.minQ);
+                            $("#MinDepth").val(data.MinDepth);
+                            $("#MaxDepth").val(data.MaxDepth);
+                            $("#FS").val(data.FS);
+                            $("#RPRS").val(data.RPRS);
+                            $("#udLength").val(data.udLength);
+                            $("#spliceSiteSize").val(data.spliceSiteSize);
+                            $("#noLog").val(data.noLog);
+                            $("#setSpliceRegions").val(data.setSpliceRegions);
+                            $("#spliceRegionExonSize").val(data.spliceRegionExonSize);
+                            $("#spliceRegionIntronMin").val(data.spliceRegionIntronMin);
+                            $("#spliceRegionIntronMax").val(data.spliceRegionIntronMax);
+                            $("#rest").modal("show")
+                        }
+                    }
+                })
+            }
+
+
+            function openDelete(obj) {
+                var i = obj.id;
+                var name = obj.value;
+                $("#dtask").empty();
+                $("#dtask").append(name);
+                $("#btn1").val(i);
+                deleteBefore();
+                $("#deleteShow").modal("show");
+
+            }
+
+            function deleteTask(obj) {
+                var id = obj.value;
+                deleting();
+                $.ajax({
+                    url: "/resequencing/task/deleteTask?id=" + id,
+                    type: "delete",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == "success") {
+                            deleteAfter();
+                        }
+                    }
+                });
+            }
+
+            function updateDelete() {
+                $("#deleteShow").modal("hide");
+                updateTable();
+            }
+
+            function openLog(obj) {
+                $("#logInfo").empty();
+                var id = obj.value;
+                $.ajax({
+                    url: "/resequencing/task/getLog?id=" + id,
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#logInfo").append(data.log);
+                        $("#logShow").modal("show")
+                    }
+                })
+            }
+
+            function tableInformation() {
+                $.ajax({
+                    url: "@routes.TaskController.getAllTask(proname)",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $('#table').bootstrapTable({data: data});
+                    }
+                })
+            }
+
+            function updateTable() {
+                $.ajax({
+                    url: "@routes.TaskController.getAllTask(proname)",
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        $("#table").bootstrapTable('load', data);
+                    }
+                });
+            }
+
+            function Running() {
+                var form = $("#resetForm")
+                var fv = form.data("formValidation")
+                fv.validate()
+                if (fv.isValid()) {
+                    $.ajax({
+                        url: "@routes.TaskController.resetTask()",
+                        type: "put",
+                        dataType: "json",
+                        data: $("#resetForm").serialize(),
+                        success: function (data) {
+                            if (data.valid == "true") {
+                                $("#rest").modal("hide");
+                                updateTable();
+                                $.ajax({
+                                    url: "/resequencing/task/runResetCmd?id=" + data.id,
+                                    type: "put"
+                                })
+                            }
+                        }
+                    })
+                }
+            }
+
+
+            $("#down-1").click(function () {
+                $("#set-1").show();
+                $("#down-1").hide();
+                $("#up-1").show()
+            });
+
+            $("#up-1").click(function () {
+                $("#set-1").hide();
+                $("#down-1").show();
+                $("#up-1").hide()
+            });
+
+            $("#down-2").click(function () {
+                $("#set-2").show();
+                $("#down-2").hide();
+                $("#up-2").show()
+            });
+
+            $("#up-2").click(function () {
+                $("#set-2").hide();
+                $("#down-2").show();
+                $("#up-2").hide()
+            });
+
+            $("#down-3").click(function () {
+                $("#set-3").show();
+                $("#down-3").hide();
+                $("#up-3").show()
+            });
+
+            $("#up-3").click(function () {
+                $("#set-3").hide();
+                $("#down-3").show();
+                $("#up-3").hide()
+            });
+
+            function spliceChange(element) {
+                var value = $(element).find(">option:selected").val();
+                if (value == "yes") {
+                    $("#spliceValue").show()
+                } else {
+                    $("#spliceValue").hide()
+                }
+            }
+
+    </script>
+
+
+}

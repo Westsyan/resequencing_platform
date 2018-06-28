@@ -1,0 +1,96 @@
+@()(implicit session: Session)
+<style>
+        .drop:hover, #new:hover, .logout:hover {
+            background-color: #F0F0F0;
+        }
+    .page-header.navbar.navbar-fixed-top {
+        z-index: 100;
+    }
+
+
+</style>
+
+<div class="page-header navbar navbar-fixed-top">
+        <!-- BEGIN HEADER INNER -->
+    <div class="page-header-inner">
+            <!-- BEGIN LOGO -->
+        <div class="page-logo">
+            <div class="menu-toggler sidebar-toggler hide">
+            </div>
+        </div>
+        <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse">
+        </a>
+        <div class="top-menu" >
+
+            <ul class="nav navbar-nav pull-right">
+
+                @if(session.get("user").isEmpty) {
+                    <li>
+                        <div>
+                            <div class="process-bar skin-green">
+                                <div class="pb-wrapper">
+                                    <div class="pb-highlight"></div>
+                                    <div class="pb-container">
+                                        <div class="pb-text"></div>
+                                        <div class="pb-value"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="disk-text"></div>
+                        </div>
+                    </li>
+
+                }
+
+
+                <li class="dropdown dropdown-user" >
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                        style="height: 46px;">
+                        <span class="username username-hide-on-mobile" style="margin-top: -10px;
+                            font-size: 13px;">
+                            @if(session.get("user").isEmpty){
+                                @session.get("admin").get
+                            }else{
+                                @session.get("user").get
+                            } </span>
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu" style="margin-top: 6px;">
+                        <li>
+
+                        </li>
+                        @if(session.get("admin").isEmpty) {
+                            <li class="drop">
+                                <a id="logout" class="logout"
+                                style="font-size: 14px;
+                                    margin-left: 1em;
+                                    color: #888888;">
+                                    <i class="fa fa-home"></i> &nbsp; 回到首页 </a>
+                            </li>
+                        }
+                        <li class="drop">
+                            <a id="logout2" class="logout"
+                            style="font-size: 14px;margin-left: 1em;color: #888888;">
+                                <i class="fa fa-user"></i> &nbsp; 退出登录 </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(function () {
+
+            var host = window.location.host.split(":")[0];
+            $("#logout").attr("href", "http://" + host + "/project/platformHome");
+            $("#logout2").attr("href", "http://" + host + "/");
+
+            if (@session.get("user").isEmpty) {
+                getDisk();
+            }
+        })
+
+</script>
+

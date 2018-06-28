@@ -1,0 +1,124 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET           /                                              controllers.LoginController.admin
+
+GET           /home/admin                                    controllers.LoginController.login
+
+GET           /home/sign                                     controllers.LoginController.sign
+
+GET           /home/signSuccess                              controllers.LoginController.signsuccess(account:String,password:String)
+
+GET           /home/toSuccess                                controllers.LoginController.toSuccess
+
+GET           /back/logout                                   controllers.LoginController.logout
+
+GET           /back/toIndex                                  controllers.LoginController.toIndex(account:String)
+
+
+
+GET           /project/home                                  controllers.SampleController.home
+
+GET           /project/uploadFile                            controllers.SampleController.enterHome(projectname:String)
+GET           /project/deployGet                             controllers.SampleController.deployGet(id:Int)
+GET           /project/loadData                              controllers.SampleController.loadData(proname:String)
+
+POST          /projects/checkRef                             controllers.SampleController.checkRef(proname:String)
+
+
+POST          /project/reset                                 controllers.SampleController.resetPE
+
+PUT           /project/updateSample                          controllers.SampleController.updateSample
+
+DELETE        /project/deleteSample                          controllers.SampleController.deleteSample(id:Int)
+
+POST          /project/getAllSmaple                          controllers.SampleController.getAllSample(proname:String)
+
+POST          /home/checkAccount                             controllers.LoginController.checkAccount
+
+GET           /project/addProject                            controllers.ProjectController.addProject
+POST          /project/checkProjectname                      controllers.ProjectController.checkProjectname
+POST          /project/checkNewproname                       controllers.ProjectController.checkNewproname
+DELETE        /project/deleteProject                         controllers.ProjectController.deleteProject(id:Int)
+POST          /project/updateProname                         controllers.ProjectController.updateProname
+
+GET           /project/openLogFile                           controllers.SampleController.openLogFile(id:Int)
+
+POST          /project/checkNewsample                        controllers.SampleController.checkNewsample(proname:String)
+POST          /project/checkSample                           controllers.SampleController.checkSample(proname:String)
+
+POST          /project/getAllSampleName                      controllers.SampleController.getAllSampleName(proname:String)
+
+GET           /resequencing/species/toSpecies                controllers.SpeciesController.toSpecies
+POST          /resequencing/species/uploadSpecies            controllers.SpeciesController.uploadSpecies
+GET           /resequencing/species/speciesInfo              controllers.SpeciesController.speciesInfo
+PUT           /resequencing/species/isRunCmd                 controllers.SpeciesController.isRunCmd(id:Int)
+GET           /resequencing/species/getAllSpecies            controllers.SpeciesController.getAllSpecies
+DELETE        /resequencing/species/deleteSpecies            controllers.SpeciesController.deleteSpecies(id:Int)
+GET           /resequencing/species/getLog                   controllers.SpeciesController.getLog(id:Int)
+PUT           /resequencing/species/updateSpeciesname        controllers.SpeciesController.updateSpeciesname
+GET           /resequencing/species/checkSpecies             controllers.SpeciesController.checkSpecies
+GET           /resequencing/species/home                     controllers.SpeciesController.home
+GET           /resequencing/species/getAllSpeciesname        controllers.SpeciesController.getAllSpeciesname
+
+GET           /resequencing/species/admin/home               controllers.SpeciesController.adminHome
+GET           /resequencing/species/admin/toSpecies          controllers.SpeciesController.toAdminSpecies
+GET           /resequencing/species/admin/speciesInfo        controllers.SpeciesController.adminSpeciesInfo
+
+GET           /resequencing/sample/toDate                    controllers.SampleController.dataPage(proname:String)
+GET           /resequencing/sample/toSE                      controllers.SampleController.toSE(proname:String)
+POST          /resequencing/sample/updatePE                  controllers.SampleController.uploadPE
+POST          /resequencing/sample/updateSE                  controllers.SampleController.uploadSE
+GET           /resequencing/sample/downloadPE                controllers.SampleController.downloadPE(id:Int,code:Int)
+GET           /resequencing/sample/downloadSE                controllers.SampleController.downloadSE(id:Int,code:Int)
+GET           /resequencing/sample/openHtml                  controllers.SampleController.openHtml(id:Int,code:Int)
+POST          /resequencing/sample/isRunCmd                  controllers.SampleController.isRunCmd(id:Int)
+GET           /resequencing/sample/deployGet                 controllers.SampleController.deployGet(id:Int)
+POST          /resequencing/sample/resetPE                   controllers.SampleController.resetPE
+GET           /resequencing/sample/openResultFile            controllers.SampleController.openResultFile(id:Int)
+
+GET           /resequencing/task/getTime                     controllers.TaskController.getTime
+GET           /resequencing/task/checkName                   controllers.TaskController.checkName(proname:String)
+POST          /resequencing/task/saveDeploy                  controllers.TaskController.saveDeploy
+GET           /resequencing/task/taskPage                    controllers.TaskController.taskPage(proname:String)
+GET           /resequencing/task/toTaskPage                  controllers.TaskController.toTaskPage(proname:String)
+POST          /resequencing/task/isRunCmd                    controllers.TaskController.isRunCmd(id:Int)
+GET           /resequencing/task/getAllTask                  controllers.TaskController.getAllTask(proname:String)
+DELETE        /resequencing/task/deleteTask                  controllers.TaskController.deleteTask(id:Int)
+GET           /resequencing/task/getLog                      controllers.TaskController.getLog(id:Int)
+GET           /resequencing/task/download                    controllers.TaskController.download(id:Int,code:Int)
+PUT           /resequencing/task/updateTaskname              controllers.TaskController.updateTaskname
+GET           /resequencing/task/getDeploy                   controllers.TaskController.getDeploy(id:Int)
+PUT           /resequencing/task/resetTask                   controllers.TaskController.resetTask
+PUT           /resequencing/task/runResetCmd                 controllers.TaskController.runResetCmd(id:Int)
+GET           /resequencing/task/checkNewname                controllers.TaskController.checkNewname(proname:String)
+
+GET           /resequencing/bsa/bsaPage                      controllers.BsaController.bsaPage(proname:String)
+GET           /resequencing/bsa/toBsaPage                    controllers.BsaController.toBsaPage(proname:String)
+GET           /resequencing/bsa/checkName                    controllers.BsaController.checkName(proname:String)
+POST          /resequencing/bsa/saveDeploy                   controllers.BsaController.saveDeploy
+POST          /resequencing/bsa/isRunCmd                     controllers.BsaController.isRunCmd(id:Int)
+GET           /resequencing/bsa/getAllBsa                    controllers.BsaController.getAllBsa(proname:String)
+DELETE        /resequencing/bsa/deleteBsa                    controllers.BsaController.deleteBsa(id:Int)
+GET           /resequencing/bsa/getLog                       controllers.BsaController.getLog(id:Int)
+GET           /resequencing/bsa/download                     controllers.BsaController.download(id:Int,code:Int)
+PUT           /resequencing/bsa/updateBsaname                controllers.BsaController.updateBsaname
+GET           /resequencing/bsa/getDeploy                    controllers.BsaController.getDeploy(id:Int)
+PUT           /resequencing/bsa/resetBsa                     controllers.BsaController.resetBsa
+PUT           /resequencing/bsa/runResetCmd                  controllers.BsaController.runResetCmd(id:Int)
+GET           /resequencing/bsa/checkNewname                 controllers.BsaController.checkNewname(proname:String)
+
+GET           /resequencing/project/deleteAll                controllers.ProjectController.deleteAll(id:Int)
+
+
+GET           /project/toAdmin                               controllers.Default.redirect(to = "http://192.168.0.140/back/adminPage")
+GET           /project/toParaSpecies                         controllers.Default.redirect(to = "http://192.168.0.140:8003/parametron/species/admin/home")
+
+
+GET           /project/selected                              controllers.LoginController.selected
+GET           /project/getDisk                               controllers.LoginController.getDisk
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                                  controllers.Assets.at(path="/public", file)

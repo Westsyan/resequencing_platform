@@ -1,0 +1,187 @@
+@(proName:Seq[String])(implicit session: Session)
+@species.main("新增参考基因组",proName){
+
+  <style>
+          label {
+            text-indent: 2em;
+          }
+
+  </style>
+
+  <div class="row-fluid">
+
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="portlet blue-soft box">
+
+          <div class="portlet-title">
+            <div class="caption">
+              新增参考基因组
+            </div>
+          </div>
+
+          <div class="portlet-body">
+
+            <form class="registration-form form-horizontal" id="UpdateForm"
+            accept-charset="UTF-8">
+
+
+
+              <div class="form-group">
+                <label class="col-sm-12">物种名:</label>
+                <div class="col-sm-4 indent">
+                  <input name="speciesname" id="speciesname" class="form-control" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-12">参考基因组序列（fasta 文件）:</label>
+                <div class="col-sm-4 indent">
+                  <input id="input-1" type="file" class="file" name="file1" data-show-preview="false"
+                  data-show-upload="false" accept=".fa,.fasta" >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-12">参考基因组注释（gtf 文件）:</label>
+                <div class="col-sm-4 indent">
+                  <input id="input-2" type="file" class="file" name="file2" data-show-preview="false"
+                  data-show-upload="false" accept=".gtf" >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class = "actions indent col-sm-4">
+                  <button type="button" class="btn btn-primary" style="width: 100%;" id="search" onclick="Running()">
+                    应用</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+          $(function () {
+            formValidation();
+          });
+
+         function formValidation() {
+            $('#UpdateForm').formValidation({
+              framework: 'bootstrap',
+              icon: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+              },
+              fields: {
+                speciesname: {
+                  validators: {
+                    notEmpty: {
+                      message: '不能为空!'
+                    },
+                    regexp: {
+                      regexp: '^[A-Za-z0-9"_"]{1,50}$',
+                      message: '50个以内字符，可使用字母、数字、下划线！'
+                    },
+                    stringLength: {
+                      message: '物种名长度最大为50！',
+                      max: function (value, validator, $field) {
+                        return 50 - (value.match(/\r/g) || []).length;
+                      }
+                    },
+                    remote: {
+                      type: 'GET',
+                      url: '@routes.SpeciesController.checkSpecies()',
+                      message:"物种名重复，请重新输入",
+                      delay: 1000
+                    }
+                  }
+                },
+                file1:{
+                  validators: {
+                    notEmpty: {
+                      message: '请选择一个数据文件！'
+                    },
+                    file: {
+                      extension: 'fa,fasta',
+                      message: '文件格式：fa,fasta！'
+                    }
+                  }
+                }
+              }
+            })
+          }
+
+
+          var time = "";
+
+
+          function Running() {
+            var date = new Date();
+            time = date.getTime();
+            var form = $("#UpdateForm")
+            var fv = form.data("formValidation")
+            fv.validate()
+            if (fv.isValid()) {
+              var element = "<div id='content'><span id='info'>文件上传中： </span><span id='progress'></span></div>";
+              var index = layer.msg(element, {
+                icon: 16
+                ,shade: 0.01,
+                time: 20000000
+              });
+              var form = new FormData($("#UpdateForm")[0]);
+              $.ajax({
+                url: "@routes.SpeciesController.uploadSpecies()",
+                type: "post",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                data: form,
+                xhr: function(){ //获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数
+
+                  myXhr = $.ajaxSettings.xhr();
+                  if(myXhr.upload){ //检查upload属性是否存在
+                    //绑定progress事件的回调函数
+                    myXhr.upload.addEventListener('progress',progressHandlingFunction, false);
+                  }
+                  return myXhr; //xhr对象返回给jQuery使用
+                },
+                success: function (data) {
+                    var id = data.id;
+                    window.location.replace("@routes.SpeciesController.speciesInfo()");
+                }
+              });
+            }
+          }
+
+          function progressHandlingFunction(e) {
+            if (e.lengthComputable) {
+              $('#progress').attr({value : e.loaded, max : e.total}); //更新数据到进度条
+              var mydate = new Date();
+              var time1 = mydate.getTime();
+              var speed = (e.loaded/1024)/((time1-time)/1000)
+              var percent = e.loaded/e.total*100;
+              $('#progress').html(percent.toFixed(2) + "%   " + parseInt(speed) + "KB/S" );
+              $('#progress').css('width', percent.toFixed(2) + "%");
+            }
+          }
+
+
+
+          $("#input-1").fileinput({
+            showPreview: false,
+            browseLabel: "选择文件"
+          });
+
+          $("#input-2").fileinput({
+            showPreview: false,
+            browseLabel: "选择文件"
+          });
+
+  </script>
+
+}

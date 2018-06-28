@@ -1,0 +1,607 @@
+@(projectName: Seq[String], proname: String)(implicit session: Session)
+    @fileupload.main("重测序分析", projectName, proname) {
+
+        <style>
+                label {
+                    text-indent: 2em;
+                }
+
+        </style>
+
+        <div class="row-fluid">
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet blue-soft box">
+
+                        <div class="portlet-title">
+                            <div class="caption">
+                                重测序分析
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+
+                            <form class="registration-form form-horizontal" id="UpdateForm"
+                            accept-charset="UTF-8">
+
+                                <div class="form-group" style="display: none;">
+                                    <div class="col-sm-6 indent">
+                                        <input name="proname" id="proname" class="form-control" value="@proname" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12">任务名:</label>
+                                    <div class="col-sm-4 indent">
+                                        <input name="taskname" id="taskname" class="form-control" />
+                                        <small style="color: red;
+                                            display: none;" id="remote" class="help-block" data-fv-validator="callback" data-fv-for="sample[]" data-fv-result="INVALID">
+                                            任务名重复！</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12">请选择样品:</label>
+                                    <div class="col-sm-4 indent">
+                                        <select name="sample[]" id="sample" class="checkbox form-control" multiple></select>
+                                    </div>
+                                    <div class="col-sm-2" style="margin-top: 5px;">
+                                        <input type="checkbox" id="checkbox" style="float: left">选择所有样品
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4">GATK Unified Genotyper(GATK编译检测参数设置)</label>
+                                    <div class="col-sm-1">
+                                        <a id="down-1" style="margin-left: 2em">
+                                            <i class="fa fa-arrow-down"></i>
+                                        </a>
+                                        <a id="up-1" style="margin-left: 2em;
+                                            display: none">
+                                            <i class="fa fa-arrow-up"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div id="set-1" style="display: none" class="indent">
+
+                                    <div class="form-group">
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Genotype likelihoods calculation model to employ:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <select class="form-control" name="genotype_likelihoods_model">
+                                                <option value="BOTH" selected>BOTH</option>
+                                                <option value="SNP">SNP</option>
+                                                <option value="INDEL">INDEL</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            The minimum phred-scaled confidence threshold at which variants not at 'trigger' track sites should be called:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="standard_min_confidence_threshold_for_calling" id="standard_min_confidence_threshold_for_calling" class="form-control" value="30.0" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            The minimum phred-scaled confidence threshold at which variants not at 'trigger' track sites should be emitted (and filtered if less than the calling threshold)"</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="standard_min_confidence_threshold_for_emitting" id="standard_min_confidence_threshold_for_emitting" class="form-control" value="30.0" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Ploidy (number of chromosomes) per sample. For pooled data, set to (Number of samples in each pool * Sample Ploidy)</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="sample_ploidy" id="sample_ploidy" class="form-control" value="2" />
+                                        </div>
+                                    </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4">Filter VCF File(变异过滤参数设置)</label>
+                                    <div class="col-sm-1">
+                                        <a id="down-2" style="margin-left: 2em">
+                                            <i class="fa fa-arrow-down"></i>
+                                        </a>
+                                        <a id="up-2" style="margin-left: 2em;
+                                            display: none">
+                                            <i class="fa fa-arrow-up"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div id="set-2" style="display: none" class="indent">
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Minimum Phred-scaled variant Quality</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="minQ" id="minQ" class="form-control" value="30" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Minimum Read Depth</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="MinDepth" id="MinDepth" class="form-control" value="5" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Maximum Read Depth</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="MaxDepth" id="MaxDepth" class="form-control" value="10000000" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Minimum Phred-scaled p-value Using Fisher's Exact Test To Detect Strand Bias</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="FS" id="FS" class="form-control" value="0" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" >
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Maximum absolute value of Z-score from Wilcoxon rank sum test of Alt vs. Ref read position bias</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <input name="RPRS" id="RPRS" class="form-control" value="2.5" />
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4">Annotate Variants(变异注释参数设置)</label>
+                                    <div class="col-sm-1">
+                                        <a id="down-3" style="margin-left: 2em">
+                                            <i class="fa fa-arrow-down"></i>
+                                        </a>
+                                        <a id="up-3" style="margin-left: 2em;
+                                            display: none">
+                                            <i class="fa fa-arrow-up"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div id="set-3" style="display: none;" class="indent">
+
+                                    <div class="form-group">
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Upstream / Downstream length:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <select class="form-control" name="udLength">
+                                                <option value="0">No upstream / downstream intervals (0 bases)</option>
+                                                <option value="200">200 bases</option>
+                                                <option value="500">500 bases</option>
+                                                <option value="1000">1000 bases</option>
+                                                <option value="2000">2000 bases</option>
+                                                <option value="5000" selected>5000 bases</option>
+                                                <option value="10000">10000 bases</option>
+                                                <option value="20000">20000 bases</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Set size for splice sites (donor and acceptor) in bases:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <select class="form-control" name="spliceSiteSize">
+                                                <option value="1">1 base</option>
+                                                <option value="2" selected>2 bases</option>
+                                                <option value="3">3 bases</option>
+                                                <option value="4">4 bases</option>
+                                                <option value="5">5 bases</option>
+                                                <option value="6">6 bases</option>
+                                                <option value="7">7 bases</option>
+                                                <option value="8">8 bases</option>
+                                                <option value="9">9 bases</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            Suppress reporting usage statistics to server:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <select class="form-control" name="noLog">
+                                                <option value="-noLog" selected>Yes</option>
+                                                <option value=" ">No</option>
+                                            </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p class="col-sm-5" style="text-indent: 1em;">
+                                            splice Region Settings:</p>
+                                        <div class="col-sm-12 indent-3">
+                                            <div class="col-sm-4">
+                                            <select class="form-control" name="setSpliceRegions" onclick="spliceChange(this)">
+                                                <option value="no" selected>Use Defaults</option>
+                                                <option value="yes">Set Splice Region Parameters</option>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="spliceValue" style="display: none;" class="indent">
+                                        <div class="form-group" >
+                                            <p class="col-sm-5" style="text-indent: 1em;">
+                                                Set size for splice site region within exons.</p>
+                                            <div class="col-sm-12 indent-3">
+                                                <div class="col-sm-4">
+                                                <input name="spliceRegionExonSize" id="spliceRegionExonSize" class="form-control" value="3" />
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" >
+                                            <p class="col-sm-5" style="text-indent: 1em;">
+                                                Set minimum number of bases for splice site region within intron.</p>
+                                            <div class="col-sm-12 indent-3">
+                                                <div class="col-sm-4">
+                                                <input name="spliceRegionIntronMin" id="spliceRegionIntronMin" class="form-control" value="3" />
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" >
+                                            <p class="col-sm-5" style="text-indent: 1em;">
+                                                Set maximum number of bases for splice site region within intron.</p>
+                                            <div class="col-sm-12 indent-3">
+                                                <div class="col-sm-4">
+                                                <input name="spliceRegionIntronMax" id="spliceRegionIntronMax" class="form-control" value="8" />
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class = "actions indent col-sm-4">
+                                        <button type="button" class="btn btn-primary" style="width: 100%;" id="search" onclick="Running()">
+                                            应用</button>
+                                    </div>
+                                </div>
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+
+
+                $("#sample").select2();
+
+                $("#checkbox").click(function () {
+                    if ($("#checkbox").is(':checked')) {
+                        $("#sample > option").prop("selected", "selected");// Select All Options
+                        $("#sample").trigger("change");// Trigger change to select 2
+                    } else {
+                        $("#sample > option").removeAttr("selected");
+                        $("#sample").trigger("change");// Trigger change to select 2
+                    }
+                });
+
+                $("#down-1").click(function () {
+                    $("#set-1").show();
+                    $("#down-1").hide();
+                    $("#up-1").show()
+                });
+
+                $("#up-1").click(function () {
+                    $("#set-1").hide();
+                    $("#down-1").show();
+                    $("#up-1").hide()
+                });
+
+                $("#down-2").click(function () {
+                    $("#set-2").show();
+                    $("#down-2").hide();
+                    $("#up-2").show()
+                });
+
+                $("#up-2").click(function () {
+                    $("#set-2").hide();
+                    $("#down-2").show();
+                    $("#up-2").hide()
+                });
+
+                $("#down-3").click(function () {
+                    $("#set-3").show();
+                    $("#down-3").hide();
+                    $("#up-3").show()
+                });
+
+                $("#up-3").click(function () {
+                    $("#set-3").hide();
+                    $("#down-3").show();
+                    $("#up-3").hide()
+                });
+
+                function spliceChange(element) {
+                    var value = $(element).find(">option:selected").val();
+                    if (value == "yes") {
+                        $("#spliceValue").show()
+                    } else {
+                        $("#spliceValue").hide()
+                    }
+                }
+
+                $(function () {
+
+                    $.ajax({
+                        url: "/project/getAllSampleName?proname=@proname",
+                        type: "post",
+                        success: function (data) {
+                            $("#sample").select2(
+                                    {
+                                        data: data,
+                                        closeOnSelect: false,
+                                    }
+                            );
+                        }
+                    });
+
+
+                    $.ajax({
+                        url: "/resequencing/task/getTime",
+                        type: "GET",
+                        success: function (data) {
+                            $("#taskname").val(data.date + "_Task");
+                        }
+                    });
+
+                    formValidation();
+                });
+
+
+                function formValidation() {
+                    $('#UpdateForm').formValidation({
+                        framework: 'bootstrap',
+                        icon: {
+                            valid: 'glyphicon glyphicon-ok',
+                            invalid: 'glyphicon glyphicon-remove',
+                            validating: 'glyphicon glyphicon-refresh'
+                        },
+                        fields: {
+                            taskname: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空!'
+                                    },
+                                    regexp: {
+                                        regexp: '^[A-Za-z0-9"_"]{1,20}$',
+                                        message: '12个以内字符，可使用字母、数字、下划线！'
+                                    },
+                                    stringLength: {
+                                        message: '任务名长度最大为20！',
+                                        max: function (value, validator, $field) {
+                                            return 20 - (value.match(/\r/g) || []).length;
+                                        }
+                                    }
+                                }
+                            },
+                            'sample[]': {
+                                validators: {
+                                    callback: {
+                                        message: '请至少选择俩个样品表型！',
+                                        callback: function (value, validator, $field) {
+                                            // Get the selected options
+                                            var options = validator.getFieldElements('sample[]').val();
+                                            return (options != null
+                                                    && options.length >= 2);
+                                        }
+                                    }
+                                }
+                            },
+                            standard_min_confidence_threshold_for_calling: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    numeric: {
+                                        message: '必须为数字！'
+                                    }
+                                }
+                            },
+                            standard_min_confidence_threshold_for_emitting: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    numeric: {
+                                        message: '必须为数字！'
+                                    }
+                                }
+                            },
+                            sample_ploidy: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    }
+                                }
+                            },
+                            minQ: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    numeric: {
+                                        message: '必须为数字！'
+                                    }
+                                }
+                            },
+                            MinDepth: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    }
+                                }
+                            },
+                            MaxDepth: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    }
+                                }
+                            },
+                            FS: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    numeric: {
+                                        message: '必须为数字！'
+                                    }
+                                }
+                            },
+                            RPRS: {
+                                validators: {
+                                    notEmpty: {
+                                        message: '不能为空！'
+                                    },
+                                    numeric: {
+                                        message: '必须为数字！'
+                                    }
+                                }
+                            },
+                            spliceRegionExonSize:{
+                                validators: {
+                                    notEmpty:{
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    },
+                                    between:{
+                                        min:1,
+                                        max:10,
+                                        message:'范围：1-10!'
+                                    }
+                                }
+                            },
+                            spliceRegionIntronMin:{
+                                validators: {
+                                    notEmpty:{
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    },
+                                    between:{
+                                        min:1,
+                                        max:10,
+                                        message:'范围：1-10!'
+                                    }
+                                }
+                            },
+                            spliceRegionIntronMax:{
+                                validators: {
+                                    notEmpty:{
+                                        message: '不能为空！'
+                                    },
+                                    integer: {
+                                        message: '必须为整数！'
+                                    },
+                                    between:{
+                                        min:1,
+                                        max:10,
+                                        message:'范围：1-10!'
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }
+
+
+                function Running() {
+                    var form = $("#UpdateForm");
+                    var fv = form.data("formValidation");
+                    fv.validate();
+                    var x = $("#otuname").value;
+                    console.log(x);
+                    if (fv.isValid()) {
+                        var index = layer.load(1, {
+                            shade: [0.1, '#fff']
+                        });
+                        $.ajax({
+                            url: "@routes.TaskController.checkName(proname)",
+                            type: "get",
+                            dataType: "json",
+                            data: $("#UpdateForm").serialize(),
+                            success: function (data) {
+                                if (data.valid == "false") {
+                                    $("#remote").show();
+                                    layer.close(index);
+                                } else {
+                                    $.ajax({
+                                        url: "@routes.TaskController.saveDeploy()",
+                                        type: "post",
+                                        dataType: "json",
+                                        data: $("#UpdateForm").serialize(),
+                                        success: function () {
+                                            window.location.replace("/resequencing/task/taskPage?proname=@proname")
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+
+        </script>
+    }

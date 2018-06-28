@@ -1,0 +1,17 @@
+@()(implicit session: Session)
+
+<div class="page-bar">
+  <ul class="page-breadcrumb">
+    <li>
+      <b style="font-size: 20px;">管理参考基因组</b>
+    </li>
+    <li style="margin-left: 2em;">
+      <a href="@routes.SpeciesController.toAdminSpecies()" ><i class="fa fa-cloud-upload"></i>
+        新增参考基因组</a>
+    </li>
+    <li style="margin-left: 2em;">
+      <a href="@routes.SpeciesController.adminSpeciesInfo()"><i class="fa fa-sliders"></i>
+        参考基因组一览</a>
+    </li>
+  </ul>
+</div>
